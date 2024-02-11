@@ -20,7 +20,7 @@ func OpenChannel() (*amqp.Channel, error) {
 }
 
 func Consume(ch *amqp.Channel, out chan<- amqp.Delivery, queue string) error {
-	messages, err := ch.Consume(
+	messagesChannel, err := ch.Consume(
 		queue,
 		"go-consumer",
 		false,
@@ -33,7 +33,7 @@ func Consume(ch *amqp.Channel, out chan<- amqp.Delivery, queue string) error {
 		return err
 	}
 
-	for msg := range messages {
+	for msg := range messagesChannel {
 		out <- msg
 	}
 
