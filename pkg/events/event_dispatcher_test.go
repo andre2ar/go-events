@@ -1,13 +1,20 @@
 package events
 
 import (
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"testing"
+	"time"
 )
 
 type TestEvent struct {
 	Name    string
 	Payload any
+}
+
+func (e *TestEvent) GetDateTime() time.Time {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (e *TestEvent) GetName() string {
@@ -103,4 +110,22 @@ func (suite *EventDispatcherTestSuit) TestEventDispatcher_Has() {
 	suite.False(suite.eventDispatcher.Has(suite.event1.GetName(), &suite.handler3))
 
 	suite.False(suite.eventDispatcher.Has(suite.event2.GetName(), &suite.handler1))
+}
+
+type MockEventHandler struct {
+	mock.Mock
+}
+
+func (m *MockEventHandler) Handle(event EventInterface) {
+	m.Called(event)
+}
+func (suite *EventDispatcherTestSuit) TestEventDispatcher_Dispatch() {
+	eventHandler := &MockEventHandler{}
+	eventHandler.On("Handle", &suite.event1)
+
+	suite.eventDispatcher.Register(suite.event1.GetName(), eventHandler)
+	suite.eventDispatcher.Dispatch(&suite.event1)
+
+	eventHandler.AssertExpectations(suite.T())
+	eventHandler.AssertNumberOfCalls(suite.T(), "Handle", 1)
 }
