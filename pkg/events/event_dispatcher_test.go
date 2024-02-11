@@ -52,11 +52,11 @@ func (suite *EventDispatcherTestSuit) SetupTest() {
 		ID: 3,
 	}
 	suite.event1 = TestEvent{
-		Name:    "Test Event",
+		Name:    "TestEvent1",
 		Payload: "test1",
 	}
 	suite.event2 = TestEvent{
-		Name:    "Test Event",
+		Name:    "TestEvent2",
 		Payload: "test2",
 	}
 }
@@ -92,4 +92,15 @@ func (suite *EventDispatcherTestSuit) TestEventDispatcher_Clear() {
 
 	suite.eventDispatcher.Clear()
 	suite.Equal(0, len(suite.eventDispatcher.handlers))
+}
+
+func (suite *EventDispatcherTestSuit) TestEventDispatcher_Has() {
+	_ = suite.eventDispatcher.Register(suite.event1.GetName(), &suite.handler1)
+	_ = suite.eventDispatcher.Register(suite.event1.GetName(), &suite.handler2)
+
+	suite.True(suite.eventDispatcher.Has(suite.event1.GetName(), &suite.handler1))
+	suite.True(suite.eventDispatcher.Has(suite.event1.GetName(), &suite.handler2))
+	suite.False(suite.eventDispatcher.Has(suite.event1.GetName(), &suite.handler3))
+
+	suite.False(suite.eventDispatcher.Has(suite.event2.GetName(), &suite.handler1))
 }
